@@ -1,11 +1,22 @@
 package com.letstour.model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+
+@Entity
 public class Tour {
-int tourId;
-String TourName;
-Destination boardingFrom;
-Destination headedTo;
-int tourDuration;
+	@Id
+	@GeneratedValue
+	int tourId;
+	String TourName;
+	@ManyToOne
+	Destination boardingFrom;
+	@ManyToOne
+	Destination headedTo;
+	int tourDuration;
+	
 public int getTourId() {
 	return tourId;
 }

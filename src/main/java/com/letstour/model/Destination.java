@@ -1,6 +1,14 @@
 package com.letstour.model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity
 public class Destination {
+	
+@Id
+@GeneratedValue
 int destinationId;
 String name;
 public int getId() {

@@ -1,12 +1,22 @@
 package com.letstour.model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity
 public class Iternary {
-int id;
-int tourId;
-String details;
-public int getId() {
-	return id;
-}
+
+	@Id
+	@GeneratedValue
+	int id;
+	int tourId;
+	String details;
+	
+	public int getId() {
+		return id;
+	}
+	
 public void setId(int id) {
 	this.id = id;
 }

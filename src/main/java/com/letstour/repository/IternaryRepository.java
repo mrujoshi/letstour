@@ -2,6 +2,8 @@ package com.letstour.repository;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface IternaryRepository  extends PagingAndSortingRepository {
+import com.letstour.model.Iternary;
+
+public interface IternaryRepository  extends PagingAndSortingRepository<Iternary,Integer> {
 
 }
