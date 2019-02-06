@@ -2,8 +2,10 @@ package com.letstour.test.TestController;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -20,6 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
@@ -31,17 +34,16 @@ import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-
+@AutoConfigureMockMvc
 public class DestinationControllerTest {
 	
 	@LocalServerPort
     private int port;
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+    @Mock
+    DestinationService destinationServiceMock;
     
     @Autowired
-    DestinationService destinationServiceMock;
     private MockMvc mockMvc;
     
     @Test
@@ -55,8 +57,8 @@ public class DestinationControllerTest {
                 .id(2)
                 .name("Hydrabad")
                 .build();
- 
-        when(destinationServiceMock.findAllDestination()).thenReturn(Arrays.asList(first, second));
+    	List<Destination> destList = Arrays.asList(first, second);
+        when(destinationServiceMock.findAllDestination()).thenReturn(destList);
  
         mockMvc.perform(get("/destination"))
                 .andExpect(status().isOk())

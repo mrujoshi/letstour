@@ -11,7 +11,7 @@ public class DestinationBuilder {
 	    }
 
 	    public DestinationBuilder id(int i) {
-	        ReflectionTestUtils.setField(model, "id", i);
+	        ReflectionTestUtils.setField(model, "destinationId", i);
 	        return this;
 	    }
 
