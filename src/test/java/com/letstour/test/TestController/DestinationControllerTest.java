@@ -2,29 +2,25 @@ package com.letstour.test.TestController;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import com.letstour.TestUtil;
+import com.letstour.controller.DestinationController;
 import com.letstour.model.Destination;
 import com.letstour.service.DestinationService;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.times;
@@ -33,23 +29,19 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@WebMvcTest(DestinationController.class)
 @AutoConfigureMockMvc
-public class DestinationControllerTest {
-	
-	@LocalServerPort
-    private int port;
 
-    @Mock
+public class DestinationControllerTest {
+
+    @MockBean
     DestinationService destinationServiceMock;
     
     @Autowired
     private MockMvc mockMvc;
     
-    @Test
-    //this test passes when all destinations are returned successfully.
-    public void getDestinationTest() throws Exception {
-    	Destination first = new DestinationBuilder()
+    private List<Destination> getDestinationList() {
+		Destination first = new DestinationBuilder()
                 .id(1)
                 .name("Pune")
                 .build();
@@ -58,6 +50,17 @@ public class DestinationControllerTest {
                 .name("Hydrabad")
                 .build();
     	List<Destination> destList = Arrays.asList(first, second);
+		return destList;
+	}
+    
+    @Test public void testSattus() throws Exception {
+    	this.mockMvc.perform(get("/destination")).andDo(print()).andExpect(status().isOk());
+    }
+    
+    @Test
+    //this test passes when all destinations are returned successfully.
+    public void getDestinationTest() throws Exception {
+    	List<Destination> destList = getDestinationList();
         when(destinationServiceMock.findAllDestination()).thenReturn(destList);
  
         mockMvc.perform(get("/destination"))
@@ -67,10 +70,56 @@ public class DestinationControllerTest {
                 .andExpect(jsonPath("$[0].id", is(1)))
                 .andExpect(jsonPath("$[0].name", is("Pune")))
                 .andExpect(jsonPath("$[1].id", is(2)))
-                .andExpect(jsonPath("$[1].name", is("Hydrabad")));
+                .andExpect(jsonPath("$[1].name", is("Hyderabad")));
  
         verify(destinationServiceMock, times(1)).findAllDestination();
         verifyNoMoreInteractions(destinationServiceMock);
     }
-	
+    
+    @Test 
+    public void getDestinationByIdTest() throws Exception{
+    	List<Destination> destList = getDestinationList();
+        when(destinationServiceMock.findDestination(1)).thenReturn(destList.get(0));
+ 
+        mockMvc.perform(get("/destination/{id}",1))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(TestUtil.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.name", is("Pune")));
+                
+        verify(destinationServiceMock, times(1)).findDestination(1);
+        verifyNoMoreInteractions(destinationServiceMock);
+    }
+    
+    @Test
+    public void findByIdWhenDestinationIsNotFound() throws Exception {
+    	List<Destination> destList = getDestinationList();
+        when(destinationServiceMock.findDestination(3)).thenReturn(destList.get(2));
+        mockMvc.perform(get("/destination/{id}", 3))
+                .andExpect(status().isNotFound());
+    }
+    
+    //test put
+    @Test
+    public void updateDestinationTest() throws Exception{
+    	
+    }
+    
+    //test post
+    
+    @Test
+    public void postDestinationTest() throws Exception{
+    	
+    }
+    
+    //test delete
+    @Test
+    public void deleteDestinationTest() throws Exception{
+    	List<Destination> destList = getDestinationList();
+        when(destinationServiceMock.findDestination(1)).thenReturn(destList.get(1));
+    	mockMvc.perform(delete("/destination/{id}", 1))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(TestUtil.APPLICATION_JSON_UTF8))
+        .andExpect(content().string("{\"id\":1,\"name\":\"Pune\"}"));
+    }
 }
