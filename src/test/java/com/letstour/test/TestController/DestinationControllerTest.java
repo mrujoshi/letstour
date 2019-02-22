@@ -2,12 +2,16 @@ package com.letstour.test.TestController;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.letstour.TestUtil;
 import com.letstour.controller.DestinationController;
 import com.letstour.model.Destination;
@@ -94,7 +98,7 @@ public class DestinationControllerTest {
     @Test
     public void findByIdWhenDestinationIsNotFound() throws Exception {
     	List<Destination> destList = getDestinationList();
-        when(destinationServiceMock.findDestination(3)).thenReturn(destList.get(2));
+        when(destinationServiceMock.findDestination(3)).thenReturn(null);
         mockMvc.perform(get("/destination/{id}", 3))
                 .andExpect(status().isNotFound());
     }
@@ -103,23 +107,40 @@ public class DestinationControllerTest {
     @Test
     public void updateDestinationTest() throws Exception{
     	
+    	
     }
     
     //test post
     
     @Test
     public void postDestinationTest() throws Exception{
+    	Destination destination = new Destination();
+    	destination.setId(1);
+    	destination.setName("Pune");
     	
+   	 when(destinationServiceMock.addDestination(destination)).thenReturn(destination);
+    	mockMvc.perform(post("/destination/") .contentType(TestUtil.APPLICATION_JSON_UTF8).content(TestUtil.convertObjectToJsonBytes(destination)))
+    	.andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+        .andExpect(jsonPath("$.id", is(1)))
+        .andExpect(jsonPath("$.name", is("Pune")));
+        
+    	verify(destinationServiceMock, times(1)).deleteDestination(1);
+    	verifyNoMoreInteractions(destinationServiceMock);
     }
     
     //test delete
     @Test
     public void deleteDestinationTest() throws Exception{
-    	List<Destination> destList = getDestinationList();
-        when(destinationServiceMock.findDestination(1)).thenReturn(destList.get(1));
+    	List<Destination> destList = this.getDestinationList();
+        when(destinationServiceMock.deleteDestination(1)).thenReturn(destList.get(0));
     	mockMvc.perform(delete("/destination/{id}", 1))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(TestUtil.APPLICATION_JSON_UTF8))
-        .andExpect(content().string("{\"id\":1,\"name\":\"Pune\"}"));
+    	.andExpect(status().isOk())
+        .andExpect(content().contentTypeCompatibleWith(TestUtil.APPLICATION_JSON_UTF8))
+        .andExpect(jsonPath("$.id", is(1)))
+        .andExpect(jsonPath("$.name", is("Pune")));
+        
+    	verify(destinationServiceMock, times(1)).deleteDestination(1);
+    	verifyNoMoreInteractions(destinationServiceMock);
     }
 }

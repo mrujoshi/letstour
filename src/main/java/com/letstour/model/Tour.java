@@ -2,15 +2,16 @@ package com.letstour.model;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 @Entity
 public class Tour {
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	int tourId;
-	String TourName;
+	String tourName;
 	@ManyToOne
 	Destination boardingFrom;
 	@ManyToOne
@@ -24,10 +25,10 @@ public void setTourId(int tourId) {
 	this.tourId = tourId;
 }
 public String getTourName() {
-	return TourName;
+	return tourName;
 }
 public void setTourName(String tourName) {
-	TourName = tourName;
+	this.tourName = tourName;
 }
 public Destination getBoardingFrom() {
 	return boardingFrom;

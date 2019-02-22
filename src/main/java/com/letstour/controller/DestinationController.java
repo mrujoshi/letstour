@@ -22,6 +22,7 @@ public class DestinationController {
 	DestinationService destinationService;
 	
 	@RequestMapping(method=RequestMethod.POST,value="/destination")
+	@ResponseBody
 	public ResponseEntity<Destination> addDestination(@RequestBody Destination destination){
 		return new ResponseEntity<Destination>(destinationService.addDestination(destination),HttpStatus.OK);
 	}

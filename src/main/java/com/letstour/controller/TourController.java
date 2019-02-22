@@ -23,6 +23,7 @@ public class TourController {
 	TourService tourService;
 	
 	@RequestMapping(method=RequestMethod.POST,value="/tour")
+	@ResponseBody
 	public ResponseEntity<Tour> addTour(@RequestBody Tour tour){
 		return new ResponseEntity<Tour>(tourService.addTour(tour),HttpStatus.OK);
 		}
